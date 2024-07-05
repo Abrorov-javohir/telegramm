@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "854364383089",
+    "project_id": "telegramm-31fa2",
+    "storage_bucket": "telegramm-31fa2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854364383089:android:00bd3b047366cdd68978d0",
+        "android_client_info": {
+          "package_name": "com.example.telegramm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDC0JfveJxGLqcDVKcd1d6V4LE_3clTRm8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
