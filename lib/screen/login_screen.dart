@@ -24,11 +24,19 @@ class _LoginScreenState extends State<LoginScreen> {
           emailController.text,
           passwordController.text,
         );
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) {
+          return ContactsScreen(
+              currentUserId: FirebaseAuth.instance.currentUser!.uid);
+        }));
       } on FirebaseAuthException catch (error) {
         Helpers.showErrorDialog(context, error.message ?? "Xatolik");
       } catch (e) {
         Helpers.showErrorDialog(context, "Tizimda xatolik");
       }
+    } else {
+      Helpers.showErrorDialog(
+          context, "Iltimos, barcha maydonlarni to'ldiring.");
     }
   }
 
@@ -58,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: passwordController,
+              obscureText: true, // Parolni yashirish uchun
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Parol",
@@ -66,13 +75,9 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: FilledButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return ContactsScreen();
-                  }));
-                },
-                style: FilledButton.styleFrom(
+              child: ElevatedButton(
+                onPressed: submit,
+                style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -83,11 +88,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (ctx) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return const RegisterScreen();
                 }));
               },
-              child: const Text("Register"),
+              child: const Text("Akkauntingiz yo'qmi? Registratsiyadan o'ting"),
             ),
           ],
         ),

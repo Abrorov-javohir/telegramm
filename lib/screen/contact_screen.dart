@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:telegramm/model/user.dart';
-import 'package:telegramm/service/user_service.dart';
-import 'chat_screen.dart'; // ChatScreen-ni import qilish
+import '../model/user.dart';
+import '../service/user_service.dart';
+import 'chat_screen.dart';
 
 class ContactsScreen extends StatefulWidget {
+  final String currentUserId;
+
+  ContactsScreen({required this.currentUserId});
+
   @override
   _ContactsScreenState createState() => _ContactsScreenState();
 }
@@ -15,10 +19,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   Widget build(BuildContext context) {
     final userService = Provider.of<UserService>(context);
-    final currentUserId =
-        'YOUR_USER_ID'; // Hozirgi foydalanuvchi ID'sini o'rnating
 
-    
     return Scaffold(
       appBar: AppBar(
         title: Text('Contacts'),
@@ -29,7 +30,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
               showDialog(
                 context: context,
                 builder: (context) {
-                  final nameController = TextEditingController();
                   final emailController = TextEditingController();
 
                   return AlertDialog(
@@ -37,13 +37,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextField(
-                          controller: nameController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter name',
-                          ),
-                        ),
-                        SizedBox(height: 8), // Qo'shimcha bo'sh joy
                         TextField(
                           controller: emailController,
                           decoration: InputDecoration(
@@ -60,11 +53,18 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         child: Text('Cancel'),
                       ),
                       TextButton(
-                        onPressed: () {
-                          userService.addContact(
-                            nameController.text,
-                            emailController.text,
-                          );
+                        onPressed: () async {
+                          final contact = await userService
+                              .getUserByEmail(emailController.text);
+                          if (contact != null) {
+                            await userService.addContact(
+                                widget.currentUserId, contact.id);
+                            print(
+                                'Contact added: ${contact.id}'); // Log contact added
+                          } else {
+                            print(
+                                'Contact not found for email: ${emailController.text}'); // Log contact not found
+                          }
                           Navigator.of(context).pop();
                         },
                         child: Text('Add'),
@@ -80,75 +80,80 @@ class _ContactsScreenState extends State<ContactsScreen> {
       body: Column(
         children: [
           TextField(
-            decoration: const InputDecoration(
-              hintText: 'Search Message', // Qidiruv maydoni uchun matn
-              border: InputBorder.none, // Chegarasiz qidiruv maydoni
-              icon: Icon(Icons.search, color: Colors.grey), // Qidiruv ikonkasi
+            decoration: InputDecoration(
+              hintText: 'Search Contacts',
+              border: InputBorder.none,
+              icon: Icon(Icons.search, color: Colors.grey),
             ),
             onChanged: (value) {
               setState(() {
-                searchQuery = value; // Qidiruv so'rovini yangilash
+                searchQuery = value;
               });
             },
           ),
           Expanded(
             child: StreamBuilder<List<User>>(
-              stream: userService.getContacts(),
+              stream: userService.getContactsStream(widget.currentUserId),
               builder: (context, snapshot) {
+                debugPrint('Snapshot data: ${snapshot.data}');
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                final contacts = snapshot.data ?? [];
+                if (contacts.isEmpty) {
                   return Center(child: Text('No contacts found.'));
                 }
-                final contacts = snapshot.data!
+                final filteredContacts = contacts
                     .where((contact) => contact.name
                         .toLowerCase()
                         .contains(searchQuery.toLowerCase()))
                     .toList();
+                if (filteredContacts.isEmpty) {
+                  return Center(child: Text('No contacts found.'));
+                }
                 return ListView.builder(
-                  itemCount: contacts.length,
+                  itemCount: filteredContacts.length,
                   itemBuilder: (context, index) {
-                    final contact = contacts[index];
+                    final contact = filteredContacts[index];
                     return ListTile(
-                        leading: GestureDetector(
-                          onTap: () {},
-                          child: CircleAvatar(
-                            child: Text(contact.name[0]),
-                          ),
+                      leading: GestureDetector(
+                        onTap: () {},
+                        child: CircleAvatar(
+                          child: Text(contact.name[0]),
                         ),
-                        title: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatScreen(
-                                    contact: contact,
-                                    currentUserId: currentUserId),
+                      ),
+                      title: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                contact: contact,
+                                currentUserId: widget.currentUserId,
                               ),
-                            );
-                          },
-                          child: Text(contact.name),
-                        ),
-                        subtitle: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatScreen(
-                                  contact: contact,
-                                  currentUserId: currentUserId,
-                                ),
+                            ),
+                          );
+                        },
+                        child: Text(contact.name),
+                      ),
+                      subtitle: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                contact: contact,
+                                currentUserId: widget.currentUserId,
                               ),
-                            );
-                          },
-                          child: const Text(
-                            'Last seen recently',
-                          ),
-                        ));
+                            ),
+                          );
+                        },
+                        child: Text(contact.email),
+                      ),
+                    );
                   },
                 );
               },

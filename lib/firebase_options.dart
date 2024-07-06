@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -64,6 +55,35 @@ class DefaultFirebaseOptions {
     projectId: 'telegramm-31fa2',
     storageBucket: 'telegramm-31fa2.appspot.com',
     iosBundleId: 'com.example.telegramm',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDYh_GVIccbKBLUnUeaNJntNvWotOV6Hjg',
+    appId: '1:854364383089:web:17b9a065c3dcf4788978d0',
+    messagingSenderId: '854364383089',
+    projectId: 'telegramm-31fa2',
+    authDomain: 'telegramm-31fa2.firebaseapp.com',
+    storageBucket: 'telegramm-31fa2.appspot.com',
+    measurementId: 'G-XNT8VHEZQK',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyD-19CXlboAVHFAiTdkdXjIT6fDQJeNlBE',
+    appId: '1:854364383089:ios:2266ca2811ac26d18978d0',
+    messagingSenderId: '854364383089',
+    projectId: 'telegramm-31fa2',
+    storageBucket: 'telegramm-31fa2.appspot.com',
+    iosBundleId: 'com.example.telegramm',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDYh_GVIccbKBLUnUeaNJntNvWotOV6Hjg',
+    appId: '1:854364383089:web:137104c901d30d248978d0',
+    messagingSenderId: '854364383089',
+    projectId: 'telegramm-31fa2',
+    authDomain: 'telegramm-31fa2.firebaseapp.com',
+    storageBucket: 'telegramm-31fa2.appspot.com',
+    measurementId: 'G-2THVERQBB4',
   );
 
 }

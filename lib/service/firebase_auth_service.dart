@@ -1,18 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:telegramm/service/user_service.dart';
 
 class FirebaseAuthService {
   final authService = FirebaseAuth.instance;
-
-  Future<void> login(String email, password) async {
-    try {
-      await authService.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
 
   Future<void> register(String email, String password) async {
     try {
@@ -20,18 +10,30 @@ class FirebaseAuthService {
         email: email,
         password: password,
       );
+      await _addDefaultContactToCurrentUser(email);
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> logout() async {
-    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  Future<void> login(String email, password) async {
     try {
-      await _firebaseAuth.signOut();
+      await authService.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      await _addDefaultContactToCurrentUser(email);
     } catch (e) {
-      print('Error logging out: $e');
-      throw e;
+      rethrow;
+    }
+  }
+
+  Future<void> _addDefaultContactToCurrentUser(String email) async {
+    final currentUser = authService.currentUser;
+    if (currentUser != null) {
+      final userService = UserService();
+      await userService.addCurrentUserToContacts(
+          currentUser.uid, "default_contact@example.com");
     }
   }
 }

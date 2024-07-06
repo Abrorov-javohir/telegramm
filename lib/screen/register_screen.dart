@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:telegramm/screen/contact_screen.dart';
+import 'package:telegramm/screen/login_screen.dart';
 import 'package:telegramm/service/firebase_auth_service.dart';
 import 'package:telegramm/utils/helpers.dart';
 
@@ -13,23 +15,28 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final passwordConfirmationController = TextEditingController();
-
   final firebaseAuthService = FirebaseAuthService();
 
   void submit() async {
     if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty) {
       try {
-        await firebaseAuthService.register(
+        await firebaseAuthService.login(
           emailController.text,
           passwordController.text,
         );
-        Navigator.pop(context);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) {
+          return ContactsScreen(
+              currentUserId: FirebaseAuth.instance.currentUser!.uid);
+        }));
       } on FirebaseAuthException catch (error) {
         Helpers.showErrorDialog(context, error.message ?? "Xatolik");
       } catch (e) {
         Helpers.showErrorDialog(context, "Tizimda xatolik");
       }
+    } else {
+      Helpers.showErrorDialog(
+          context, "Iltimos, barcha maydonlarni to'ldiring.");
     }
   }
 
@@ -59,25 +66,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const SizedBox(height: 10),
             TextField(
               controller: passwordController,
+              obscureText: true, // Parolni yashirish uchun
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Parol",
               ),
             ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: passwordConfirmationController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Parolni tasdiqlang",
-              ),
-            ),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: FilledButton(
+              child: ElevatedButton(
                 onPressed: submit,
-                style: FilledButton.styleFrom(
+                style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -88,9 +88,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const LoginScreen();
+                }));
               },
-              child: const Text("Login"),
+              child: const Text("Akkauntingiz bormi? Kiring"),
             ),
           ],
         ),

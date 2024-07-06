@@ -1,25 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Chat {
-  String messages;
-  String sendId;
-  String receivedId;
-  String id;
+  final String id;
+  final String messages;
+  final String senderId;
+  final String receivedId;
 
   Chat({
-    required this.messages,
     required this.id,
+    required this.messages,
+    required this.senderId,
     required this.receivedId,
-    required this.sendId,
   });
 
-  factory Chat.fromJson(DocumentSnapshot doc) {
+  factory Chat.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Chat(
       id: doc.id,
-      messages: data['messages'],
-      receivedId: data['receivedId'],
-      sendId: data['sendId'],
+      messages: data['messages'] as String,
+      senderId: data['senderId'] as String,
+      receivedId: data['receivedId'] as String,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'messages': messages,
+      'senderId': senderId,
+      'receivedId': receivedId,
+    };
   }
 }
