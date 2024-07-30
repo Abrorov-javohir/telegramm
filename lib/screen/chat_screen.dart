@@ -1,82 +1,81 @@
-import 'package:flutter/material.dart';
-import 'package:telegramm/service/message_service.dart';
-import '../model/chat.dart';
-import '../model/user.dart';
+import 'package:flutter/material.dart'; // Flutter Material dizayn paketini import qilish
+import 'package:telegramm/model/chat.dart'; // Profil ekranini import qilish
 
-class ChatScreen extends StatelessWidget {
-  final User contact;
-  final String currentUserId;
+// ChatScreen StatefulWidget deklaratsiyasi
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
 
-  ChatScreen({required this.contact, required this.currentUserId});
-  final TextEditingController _controller = TextEditingController();
-  final ChatService _chatService = ChatService();
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
 
-  Future<void> _sendMessage() async {
-    if (_controller.text.isEmpty) return;
-    await _chatService.addMessage(_controller.text, currentUserId, contact.id);
-    _controller.clear();
-  }
+// ChatScreenning holatini boshqaradigan sinf
+class _ChatScreenState extends State<ChatScreen> {
+  // Chat elementlarining ro'yxati
+  List<Map<String, String>> chatItems = [
+    {'name': 'Javohir', 'message': 'You Sent a Sticker'},
+    {'name': 'Asrorbek', 'message': 'Asror Sereal Sent Gift'},
+    {'name': 'Asilbek', 'message': 'Hi'},
+    {'name': 'Putri Chania', 'message': 'Putri Chania Sent Gift'},
+  ];
+
+  // Qidiruv so'rovi uchun o'zgaruvchi
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
+    // Qidiruv so'roviga mos keladigan chat elementlarini filtrlash
+    List<Map<String, String>> filteredChatItems = chatItems
+        .where((chatItem) =>
+            chatItem['name']!.toLowerCase().contains(searchQuery.toLowerCase()))
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(contact.name),
+        title: const Text('Chats'), // AppBar sarlavhasi
+        backgroundColor: Colors.white, // AppBar fon rangi
+        foregroundColor: Colors.black, // AppBar matn rangi
+        elevation: 0, // AppBar soyasi
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<List<Chat>>(
-              stream: _chatService.getChats(currentUserId, contact.id),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                final messages = snapshot.data!;
-                return ListView.builder(
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    return ListTile(
-                      title: Text(message.messages),
-                      subtitle: Text('Sender: ${message.senderId}'),
-                    );
-                  },
-                );
-              },
+      body: Padding(
+        padding:
+            const EdgeInsets.all(16.0), // Tananing chetidan 16 piksel bo'sh joy
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0), // Gorizontal bo'sh joy
+              decoration: BoxDecoration(
+                color: Colors.grey[200], // Kontayner fon rangi
+                borderRadius:
+                    BorderRadius.circular(30.0), // Kontaynerning burchaklari
+              ),
+              child: TextField(
+                decoration: const InputDecoration(
+                  hintText: 'Search Message', // Qidiruv maydoni uchun matn
+                  border: InputBorder.none, // Chegarasiz qidiruv maydoni
+                  icon: Icon(Icons.search,
+                      color: Colors.grey), // Qidiruv ikonkasi
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value; // Qidiruv so'rovini yangilash
+                  });
+                },
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.camera_alt),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(Icons.photo),
-                  onPressed: () {},
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: 'Text message',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _sendMessage,
-                ),
-              ],
+            Expanded(
+              child: ListView(
+                children: filteredChatItems
+                    .map((chatItem) => ChatItem(
+                          name: chatItem['name']!, // Chat ismi
+                          message: chatItem['message']!, // Chat xabari
+                        ))
+                    .toList(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

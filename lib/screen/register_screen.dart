@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:telegramm/screen/contact_screen.dart';
+import 'package:telegramm/screen/chat_screen.dart';
 import 'package:telegramm/screen/login_screen.dart';
 import 'package:telegramm/service/firebase_auth_service.dart';
 import 'package:telegramm/utils/helpers.dart';
@@ -26,8 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {
-          return ContactsScreen(
-              currentUserId: FirebaseAuth.instance.currentUser!.uid);
+          return ChatScreen();
         }));
       } on FirebaseAuthException catch (error) {
         Helpers.showErrorDialog(context, error.message ?? "Xatolik");

@@ -1,26 +1,35 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../model/chat.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ChatService {
-  final CollectionReference _chatsCollection =
-      FirebaseFirestore.instance.collection('chats');
+// class MessageService {
+//   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Stream<List<Chat>> getChats(String currentUserId, String contactId) {
-    return _chatsCollection
-        .where('senderId', isEqualTo: currentUserId)
-        .where('receivedId', isEqualTo: contactId)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) => Chat.fromDocument(doc)).toList();
-    });
-  }
+//   // Send a message
+//   Future<void> sendMessage(String chatId, String text, bool isSent) async {
+//     await _firestore
+//         .collection('chats')
+//         .doc(chatId)
+//         .collection('messages')
+//         .add({
+//       'text': text,
+//       'isSent': isSent,
+//       'timestamp': FieldValue.serverTimestamp(),
+//     });
+//   }
 
-  Future<void> addMessage(
-      String message, String senderId, String receivedId) async {
-    await _chatsCollection.add({
-      'messages': message,
-      'senderId': senderId,
-      'receivedId': receivedId,
-    });
-  }
-}
+//   // Get messages stream
+//   Stream<List<Map<String, dynamic>>> getMessages(String chatId) {
+//     return _firestore
+//         .collection('chats')
+//         .doc(chatId)
+//         .collection('messages')
+//         .orderBy('timestamp', descending: true)
+//         .snapshots()
+//         .map((snapshot) => snapshot.docs.map((doc) {
+//               return {
+//                 'text': doc['text'],
+//                 'isSent': doc['isSent'],
+//                 'timestamp': doc['timestamp'],
+//               };
+//             }).toList());
+//   }
+// }

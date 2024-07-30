@@ -1,33 +1,31 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:telegramm/screen/sms.dart';
 
-class Chat {
-  final String id;
-  final String messages;
-  final String senderId;
-  final String receivedId;
+class ChatItem extends StatelessWidget {
+  final String name;
+  final String message;
 
-  Chat({
-    required this.id,
-    required this.messages,
-    required this.senderId,
-    required this.receivedId,
-  });
+  ChatItem({required this.name, required this.message});
 
-  factory Chat.fromDocument(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return Chat(
-      id: doc.id,
-      messages: data['messages'] as String,
-      senderId: data['senderId'] as String,
-      receivedId: data['receivedId'] as String,
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        child: Text(name[0]),
+        radius: 24,
+        backgroundColor: Colors.grey[300],
+      ),
+      title: Text(
+        name,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(message),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Chat()),
+        );
+      },
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'messages': messages,
-      'senderId': senderId,
-      'receivedId': receivedId,
-    };
   }
 }
